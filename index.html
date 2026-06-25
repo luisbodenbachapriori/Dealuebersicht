@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Apriori Dealübersicht</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --card2:#243349; --text:#e2e8f0; --muted:#94a3b8;
+    --line:#334155; --accent:#38bdf8;
+    --bronze:#cd7f32; --silber:#c0c0c0; --gold:#f1c40f; --ok:#22c55e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--text);padding:32px;line-height:1.45}
+  .wrap{max-width:1100px;margin:0 auto}
+  header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:28px}
+  h1{margin:0;font-size:28px;letter-spacing:.3px}
+  .quarter{color:var(--accent);font-weight:600}
+  .headright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .updated{color:var(--muted);font-size:13px}
+  .reload{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:999px;
+          padding:6px 14px;font-size:13px;cursor:pointer}
+  .reload:hover{border-color:var(--accent)}
+  .reload:disabled{opacity:.5;cursor:default}
+  .grid{display:grid;gap:18px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card .label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+  .card .value{font-size:32px;font-weight:700;margin-top:6px}
+  .section-title{font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 14px}
+  .goals{margin-bottom:28px}
+  .goalbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .tierline{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .track{position:relative;height:34px;background:var(--card2);border-radius:18px;overflow:hidden}
+  .fill{position:absolute;left:0;top:0;height:100%;border-radius:18px;
+        background:linear-gradient(90deg,#0ea5e9,#22d3ee);transition:width .6s ease}
+  .marks{position:relative;height:46px;margin-top:8px}
+  .mark{position:absolute;transform:translateX(-50%);text-align:center;font-size:12px;color:var(--muted)}
+  .mark b{display:block;color:var(--text);font-size:13px}
+  .mark.bronze b{color:var(--bronze)} .mark.silber b{color:var(--silber)} .mark.gold b{color:var(--gold)}
+  .badge{display:inline-block;margin-top:14px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px;
+         background:var(--card2);border:1px solid var(--line)}
+  .badge.bronze{color:var(--bronze)} .badge.silber{color:var(--silber)} .badge.gold{color:var(--gold)}
+  .locs{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-bottom:28px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px}
+  th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:12px;letter-spacing:.5px}
+  tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .stage{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--card2);border:1px solid var(--line)}
+  .errorbox{grid-column:1/-1;background:var(--card);border:1px solid #7f1d1d;border-radius:14px;padding:20px}
+  .errorbox .label{color:#fca5a5}
+  .errorbox .msg{margin-top:6px;color:var(--muted);font-size:14px}
+  footer{margin-top:30px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="title">Dealübersicht</h1>
+      <div class="quarter" id="quarter"></div>
+    </div>
+    <div class="headright">
+      <button class="reload" id="reload" type="button">Aktualisieren</button>
+      <div class="updated" id="updated">Lade Daten…</div>
+    </div>
+  </header>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <div class="goals">
+    <div class="section-title">Teamziel-Fortschritt (Umsatz)</div>
+    <div class="goalbar" id="goalbar"></div>
+  </div>
+
+  <div class="section-title">Standorte</div>
+  <div class="grid locs" id="locs"></div>
+
+  <div class="section-title">Deals</div>
+  <div id="dealsWrap"></div>
+
+  <footer>Apriori · automatisch aktualisiert über n8n &amp; Vincere</footer>
+</div>
+
+<script>
+// Quelle der Daten: overview-config.json direkt aus dem GitHub-Repo (Branch main).
+const CONFIG_URL = "https://raw.githubusercontent.com/luisbodenbachapriori/Dealuebersicht/main/overview-config.json";
+
+const euro = n => new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0);
+const num  = n => new Intl.NumberFormat("de-DE").format(n||0);
+
+function render(cfg){
+  const meta=cfg.meta||{}, goals=cfg.goals||{}, totals=cfg.totals||{}, locations=cfg.locations||[], deals=cfg.deals||[];
+  document.getElementById("title").textContent = meta.title || "Dealübersicht";
+  document.getElementById("quarter").textContent = meta.quarter || "";
+  if(meta.lastUpdated){
+    const d=new Date(meta.lastUpdated);
+    document.getElementById("updated").textContent =
+      "Stand: "+d.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  } else {
+    document.getElementById("updated").textContent = "";
+  }
+  const avg = totals.dealsCount ? totals.revenue/totals.dealsCount : 0;
+  document.getElementById("kpis").innerHTML = [
+    {l:"Umsatz gesamt", v:euro(totals.revenue)},
+    {l:"Deals gesamt",  v:num(totals.dealsCount)},
+    {l:"Ø Dealwert",    v:euro(avg)},
+    {l:"Standorte",     v:num(locations.length)}
+  ].map(k=>`<div class="card"><div class="label">${k.l}</div><div class="value">${k.v}</div></div>`).join("");
+
+  const rev = totals.revenue||0;
+  const tiers = ["bronze","silber","gold"].map(k=>goals[k]).filter(Boolean);
+  const maxTarget = Math.max(1, ...tiers.map(t=>t.target||0));
+  const pct = Math.min(100, (rev/maxTarget)*100);
+  let reached=null;
+  ["gold","silber","bronze"].forEach(k=>{ if(!reached && goals[k] && rev>=(goals[k].target||0)) reached=goals[k].label; });
+  const marks = tiers.map(t=>{
+    const left=Math.min(100,((t.target||0)/maxTarget)*100);
+    const cls=(t.label||"").toLowerCase();
+    return `<div class="mark ${cls}" style="left:${left}%"><b>${t.label}</b>${euro(t.target)}</div>`;
+  }).join("");
+  document.getElementById("goalbar").innerHTML =
+    `<div class="tierline"><span>Aktueller Umsatz: <b style="color:var(--text)">${euro(rev)}</b></span><span>${pct.toFixed(0)} % von ${euro(maxTarget)} (Gold)</span></div>`+
+    `<div class="track"><div class="fill" style="width:${pct}%"></div></div>`+
+    `<div class="marks">${marks}</div>`+
+    (reached ? `<span class="badge ${reached.toLowerCase()}">★ ${reached} erreicht</span>` : `<span class="badge">Noch kein Tier erreicht</span>`);
+
+  document.getElementById("locs").innerHTML = locations.map(l=>
+    `<div class="card"><div class="label">${l.name||""}</div><div class="value">${euro(l.revenue)}</div>`+
+    `<div style="color:var(--muted);margin-top:4px">${num(l.dealsCount)} Deals</div></div>`).join("");
+
+  const rows = deals.map(d=>
+    `<tr><td>${d.title||""}</td><td>${d.client||""}</td><td>${d.owner||""}</td><td>${d.location||""}</td>`+
+    `<td><span class="stage">${d.stage||""}</span></td><td class="num">${euro(d.value)}</td></tr>`).join("");
+  document.getElementById("dealsWrap").innerHTML =
+    `<table><thead><tr><th>Position</th><th>Kunde</th><th>Owner</th><th>Standort</th><th>Status</th><th class="num">Wert</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function showError(msg){
+  document.getElementById("updated").textContent = "Laden fehlgeschlagen";
+  document.getElementById("kpis").innerHTML =
+    `<div class="errorbox"><div class="label">Fehler beim Laden der Daten</div>`+
+    `<div class="msg">${msg}</div></div>`;
+  document.getElementById("goalbar").innerHTML = "";
+  document.getElementById("locs").innerHTML = "";
+  document.getElementById("dealsWrap").innerHTML = "";
+}
+
+async function load(){
+  const btn = document.getElementById("reload");
+  btn.disabled = true;
+  document.getElementById("updated").textContent = "Lade Daten…";
+  try{
+    const res = await fetch(CONFIG_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status + " beim Abruf der Config");
+    let cfg = await res.json();
+    if(Array.isArray(cfg)) cfg = cfg[0] || {};
+    render(cfg);
+  }catch(e){
+    showError(e.message + " — Prüfe, ob overview-config.json im Repo liegt und das Repo öffentlich ist.");
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("reload").addEventListener("click", load);
+load();
+</script>
+</body>
+</html>
