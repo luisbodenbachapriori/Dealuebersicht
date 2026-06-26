@@ -6,211 +6,305 @@
 <title>APRIORI Team Dashboard</title>
 <style>
   :root{
-    --bg:#0f172a; --card:#1e293b; --card2:#243349; --text:#e2e8f0; --muted:#94a3b8;
-    --line:#334155; --accent:#38bdf8;
-    --bronze:#cd7f32; --silber:#c0c0c0; --gold:#f1c40f; --ok:#22c55e; --red:#ef4444;
+    --bg:#161b24; --panel:#1b2230; --card:#222b3b; --card2:#2c3647;
+    --text:#eef2f8; --muted:#9aa7bd; --muted2:#6b7689; --line:rgba(255,255,255,.08);
+    --red:#e63a5e; --red-deep:#c10230; --red-dark:#8c0123;
+    --blue:#3d8bff; --gold:#f5c518; --green:#2fbf71;
+    --bronze:#cd7f32; --silber:#c4ccd6;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-       background:var(--bg);color:var(--text);padding:32px;line-height:1.45}
-  .wrap{max-width:1100px;margin:0 auto}
-  header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:28px}
-  h1{margin:0;font-size:26px;letter-spacing:.3px}
-  .subtitle{color:var(--muted);font-size:14px;margin-top:4px}
-  .quarter{color:var(--accent);font-weight:600;margin-top:2px}
-  .headright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .updated{color:var(--muted);font-size:13px}
-  .livebadge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;
-             background:rgba(34,197,94,.12);color:var(--ok);border:1px solid rgba(34,197,94,.4)}
+       background:radial-gradient(1200px 600px at 70% -10%,#1d2533 0%,var(--bg) 60%);color:var(--text);
+       padding:28px;line-height:1.45;min-height:100vh}
+  .wrap{max-width:1120px;margin:0 auto}
+
+  header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--red),var(--red-deep));
+        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;letter-spacing:.5px;
+        box-shadow:0 6px 18px rgba(193,2,48,.35)}
+  h1{margin:0;font-size:23px;letter-spacing:.2px;font-weight:750}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:3px}
+  .quarter{color:var(--red);font-weight:700;font-size:13px;margin-top:2px;letter-spacing:.3px}
+  .headright{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+  .live{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;
+        background:rgba(47,191,113,.12);color:var(--green);border:1px solid rgba(47,191,113,.35)}
+  .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,191,113,.5)}70%{box-shadow:0 0 0 7px rgba(47,191,113,0)}100%{box-shadow:0 0 0 0 rgba(47,191,113,0)}}
+  .updated{color:var(--muted2);font-size:12px}
   .reload{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:999px;
-          padding:6px 14px;font-size:13px;cursor:pointer}
-  .reload:hover{border-color:var(--accent)}
+          padding:6px 14px;font-size:12px;cursor:pointer}
+  .reload:hover{border-color:var(--red)}
   .reload:disabled{opacity:.5;cursor:default}
-  .grid{display:grid;gap:18px}
-  .kpis{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-bottom:28px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
-  .card .label{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.5px}
-  .card .value{font-size:30px;font-weight:700;margin-top:6px}
-  .card .sub{color:var(--muted);font-size:13px;margin-top:4px}
-  .mini{position:relative;height:8px;background:var(--card2);border-radius:999px;overflow:hidden;margin-top:12px}
-  .mini > span{position:absolute;left:0;top:0;height:100%;border-radius:999px;background:linear-gradient(90deg,#0ea5e9,#22d3ee)}
-  .section-title{font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 14px}
-  .goals{margin-bottom:30px}
-  .goalbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
-  .tierline{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted);margin-bottom:10px}
-  .track{position:relative;height:34px;background:var(--card2);border-radius:18px;overflow:hidden}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;gap:2px}
+  .seg button{border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:600;
+              padding:7px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .seg button:hover{color:var(--text)}
+  .seg.sparte button.active{background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff;
+                            box-shadow:0 3px 10px rgba(193,2,48,.3)}
+  .seg.loc button.active{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(216px,1fr));margin-bottom:26px}
+  .card{background:linear-gradient(180deg,var(--card) 0%,var(--panel) 100%);border:1px solid var(--line);
+        border-radius:16px;padding:18px 20px}
+  .card .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+  .card .value{font-size:30px;font-weight:800;margin-top:6px;letter-spacing:.3px}
+  .card .value .of{color:var(--muted2);font-size:20px;font-weight:600}
+  .card .sub{color:var(--muted2);font-size:12px;margin-top:5px}
+  .mini{position:relative;height:7px;background:var(--card2);border-radius:999px;overflow:hidden;margin-top:13px}
+  .mini > span{position:absolute;left:0;top:0;height:100%;border-radius:999px}
+  .mini.red > span{background:linear-gradient(90deg,var(--red-dark),var(--red))}
+  .mini.blue > span{background:linear-gradient(90deg,#1f5fd6,var(--blue))}
+  .card.accent{border-color:rgba(230,58,94,.35)}
+  .card.accent .value{color:#fff}
+
+  .section-title{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);text-transform:uppercase;
+                 letter-spacing:.7px;margin:6px 0 13px;font-weight:700}
+  .sq{width:11px;height:11px;border-radius:3px;background:var(--red);display:inline-block;flex:none}
+  .pill{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted2);text-transform:none;letter-spacing:0}
+
+  .goals{margin-bottom:28px}
+  .goalbar{background:linear-gradient(180deg,var(--card),var(--panel));border:1px solid var(--line);border-radius:16px;padding:22px}
+  .tierline{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted);margin-bottom:12px}
+  .track{position:relative;height:36px;background:var(--card2);border-radius:18px;overflow:hidden}
   .fill{position:absolute;left:0;top:0;height:100%;border-radius:18px;
-        background:linear-gradient(90deg,#0ea5e9,#22d3ee);transition:width .6s ease}
-  .marks{position:relative;height:46px;margin-top:8px}
-  .mark{position:absolute;transform:translateX(-50%);text-align:center;font-size:12px;color:var(--muted)}
+        background:linear-gradient(90deg,var(--red-dark),var(--red));transition:width .7s ease}
+  .marks{position:relative;height:48px;margin-top:10px}
+  .mark{position:absolute;transform:translateX(-50%);text-align:center;font-size:12px;color:var(--muted2)}
   .mark b{display:block;color:var(--text);font-size:13px}
   .mark.bronze b{color:var(--bronze)} .mark.silber b{color:var(--silber)} .mark.gold b{color:var(--gold)}
-  .badge{display:inline-block;margin-top:14px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px;
+  .badge{display:inline-block;margin-top:14px;padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px;
          background:var(--card2);border:1px solid var(--line)}
   .badge.bronze{color:var(--bronze)} .badge.silber{color:var(--silber)} .badge.gold{color:var(--gold)}
+
   .battle{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;
-          background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:30px}
-  .side{text-align:center}
-  .side .loc{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .side .big{font-size:44px;font-weight:800;margin:4px 0}
-  .side .cap{font-size:12px;color:var(--muted)}
-  .side.win .big{color:var(--accent)}
-  .vs{font-size:14px;color:var(--muted);font-weight:700}
-  .lbcols{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:30px}
-  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line);font-size:14px}
-  th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:12px;letter-spacing:.5px}
-  tr:last-child td{border-bottom:none}
-  td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
-  .rank{width:34px;color:var(--muted)}
-  .ini{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;
-       background:var(--card2);border:1px solid var(--line);font-size:12px;font-weight:700;margin-right:10px}
-  .loc-tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--muted);margin-left:8px}
-  .errorbox{grid-column:1/-1;background:var(--card);border:1px solid #7f1d1d;border-radius:14px;padding:20px}
+          background:linear-gradient(180deg,var(--card),var(--panel));border:1px solid var(--line);
+          border-radius:16px;padding:26px;margin-bottom:28px}
+  .side{text-align:center;border-radius:14px;padding:14px 8px}
+  .side .loc{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .side .big{font-size:46px;font-weight:850;margin:6px 0;line-height:1}
+  .side .cap{font-size:12px;color:var(--muted2)}
+  .side.win{background:rgba(230,58,94,.08)}
+  .side.win .big{color:var(--red)}
+  .vs{font-size:13px;color:var(--muted2);font-weight:800;letter-spacing:1px}
+
+  .lbcols{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));margin-bottom:28px;align-items:start}
+  .lbcard{background:linear-gradient(180deg,var(--card),var(--panel));border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .lbhead{padding:15px 18px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.6px;
+          color:var(--muted);font-weight:700;display:flex;align-items:center;gap:8px}
+  .row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .rank{width:26px;text-align:center;font-weight:800;color:var(--muted2);font-size:14px;flex:none}
+  .ini{flex:none;width:34px;height:34px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+       display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  .who{flex:1;min-width:0}
+  .who .nm{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .loc-tag{font-size:10px;padding:2px 7px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+           color:var(--muted);margin-left:7px;vertical-align:middle}
+  .dealn{flex:none;font-variant-numeric:tabular-nums;font-weight:800;font-size:16px}
+  .dealn small{color:var(--muted2);font-weight:600;font-size:12px;margin-left:3px}
+  .empty{padding:18px;color:var(--muted2);font-size:13px}
+
+  .errorbox{grid-column:1/-1;background:var(--card);border:1px solid #7f1d1d;border-radius:16px;padding:20px}
   .errorbox .label{color:#fca5a5}
   .errorbox .msg{margin-top:6px;color:var(--muted);font-size:14px}
-  footer{margin-top:30px;color:var(--muted);font-size:12px;text-align:center}
+  footer{margin-top:30px;color:var(--muted2);font-size:12px;text-align:center}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div>
-      <h1 id="title">Team Dashboard</h1>
-      <div class="subtitle" id="subtitle"></div>
-      <div class="quarter" id="quarter"></div>
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <h1 id="title">Team Dashboard</h1>
+        <div class="subtitle" id="subtitle"></div>
+        <div class="quarter" id="quarter"></div>
+      </div>
     </div>
     <div class="headright">
-      <span class="livebadge" id="live">Vincere Live</span>
+      <span class="live"><span class="dot"></span><span id="liveText">Vincere Live</span></span>
       <button class="reload" id="reload" type="button">Aktualisieren</button>
       <div class="updated" id="updated">Lade Daten…</div>
     </div>
   </header>
 
+  <div class="toolbar" id="toolbar">
+    <div class="seg sparte" data-group="sparte">
+      <button data-val="gesamt" class="active">Gesamt</button>
+      <button data-val="experts">Experts</button>
+      <button data-val="contracting">Contracting</button>
+    </div>
+    <div class="seg loc" data-group="location">
+      <button data-val="all" class="active">Alle Standorte</button>
+      <button data-val="FFM">Frankfurt</button>
+      <button data-val="B">Berlin</button>
+    </div>
+  </div>
+
   <div class="grid kpis" id="kpis"></div>
 
   <div class="goals">
-    <div class="section-title">Quartals-Challenge · Neue Deals (Experts)</div>
+    <div class="section-title"><span class="sq"></span><span id="goalTitle">Quartals-Challenge · Neue Deals</span> <span class="pill">Gold / Silber / Bronze</span></div>
     <div class="goalbar" id="goalbar"></div>
   </div>
 
-  <div class="section-title">Standort-Battle · Frankfurt vs. Berlin</div>
+  <div class="section-title"><span class="sq"></span>Standort-Battle · Frankfurt vs. Berlin <span class="pill" id="battlePill">Deals</span></div>
   <div id="battleWrap"></div>
 
-  <div class="section-title">Leaderboard · Deals je Recruiter</div>
+  <div class="section-title"><span class="sq"></span>Leaderboard · Placements je Recruiter</div>
   <div class="grid lbcols" id="leaderWrap"></div>
 
-  <footer>APRIORI · automatisch aktualisiert über n8n &amp; Vincere</footer>
+  <footer>Datenquelle: Vincere CRM (Live-Sync) · automatisch aktualisiert über n8n &amp; GitHub Pages</footer>
 </div>
 
 <script>
-// Quelle der Daten: overview-config.json direkt aus dem GitHub-Repo (Branch main).
 const CONFIG_URL = "https://raw.githubusercontent.com/luisbodenbachapriori/Dealuebersicht/main/overview-config.json";
 
 const num = n => new Intl.NumberFormat("de-DE").format(n||0);
+const pct = (cur,tgt) => tgt>0 ? Math.min(100,(cur/tgt)*100) : 0;
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const spLabel = s => s==='experts'?'Experts':s==='contracting'?'Contracting':'Gesamt';
 
-function progress(cur, tgt){ return tgt>0 ? Math.min(100,(cur/tgt)*100) : 0; }
+let DATA = null;
+let STATE = { sparte:'gesamt', location:'all' };
+
+function rowsFor(sparte){
+  const lb = (DATA&&DATA.leaderboard)||{};
+  const ex = (lb.experts||[]).map(r=>Object.assign({sparte:'experts'},r));
+  const co = (lb.contracting||[]).map(r=>Object.assign({sparte:'contracting'},r));
+  if(sparte==='experts') return ex;
+  if(sparte==='contracting') return co;
+  return ex.concat(co);
+}
+const byLoc = (rows,loc) => loc==='all' ? rows : rows.filter(r=>(r.location||'').toUpperCase()===loc);
+const sumDeals = rows => rows.reduce((a,b)=>a+(b.deals||0),0);
+
+function update(){
+  if(!DATA) return;
+  const meta=DATA.meta||{}, goals=DATA.goals||{}, kpis=DATA.kpis||{};
+  const sp=STATE.sparte, loc=STATE.location;
+
+  const sel = byLoc(rowsFor(sp), loc);
+  const dealsCount = sumDeals(sel);
+
+  // ---- KPI-Karten ----
+  const runner=kpis.activeRunner||{}, rahmen=kpis.rahmenvertraege||{}, team=kpis.teamSize||{};
+  const gold = goals.gold && goals.gold.target;
+  const cards = [];
+  if(runner.target!=null) cards.push({accent:true,l:"Aktive Runner",
+      v:num(runner.current)+'<span class="of"> / '+num(runner.target)+'</span>',
+      sub:"Jahresziel · noch "+num(Math.max(0,(runner.target||0)-(runner.current||0)))+" bis Ziel",
+      bar:"red",p:pct(runner.current,runner.target)});
+  cards.push({l:"Deals "+(meta.quarter||"")+" · "+spLabel(sp),
+      v:num(dealsCount)+(gold!=null?'<span class="of"> / '+num(gold)+'</span>':''),
+      sub:gold!=null?"Gold-Ziel "+num(gold):"", bar:"red", p:gold!=null?pct(dealsCount,gold):null});
+  if(rahmen.target!=null) cards.push({l:"Rahmenverträge",
+      v:num(rahmen.current)+'<span class="of"> / '+num(rahmen.target)+'</span>',
+      sub:"Ziel · noch "+num(Math.max(0,(rahmen.target||0)-(rahmen.current||0)))+" Partner",
+      bar:"blue",p:pct(rahmen.current,rahmen.target)});
+  if(team.total!=null) cards.push({l:"Team-Größe",v:num(team.total)+" Köpfe",
+      sub:[team.recruiting!=null?num(team.recruiting)+" Recruiting":null,
+           team.kam!=null?num(team.kam)+" KAM":null,
+           team.berlin!=null?num(team.berlin)+" Berlin":null].filter(Boolean).join(" · ")});
+  document.getElementById("kpis").innerHTML = cards.map(k=>
+    `<div class="card${k.accent?' accent':''}"><div class="label">${esc(k.l)}</div>`+
+    `<div class="value">${k.v}</div>`+
+    (k.sub?`<div class="sub">${esc(k.sub)}</div>`:"")+
+    (k.p!=null?`<div class="mini ${k.bar||'red'}"><span style="width:${k.p}%"></span></div>`:"")+
+    `</div>`).join("");
+
+  // ---- Ziel-Stufen (gefilterte Deal-Anzahl) ----
+  document.getElementById("goalTitle").textContent = "Quartals-Challenge · Neue Deals ("+spLabel(sp)+")";
+  const cur = dealsCount;
+  const tiers = ["bronze","silber","gold"].map(k=>goals[k]).filter(t=>t&&t.target!=null);
+  const maxTarget = Math.max(1, ...tiers.map(t=>t.target||0));
+  const fillPct = Math.min(100,(cur/maxTarget)*100);
+  let reached=null, next=null;
+  ["bronze","silber","gold"].forEach(k=>{ const t=goals[k];
+    if(t&&t.target!=null){ if(cur>=t.target) reached=t; else if(!next) next=t; } });
+  const medal = c=>({bronze:"🥉",silber:"🥈",gold:"🥇"}[c]||"");
+  const marks = tiers.map(t=>{
+    const left=Math.min(100,((t.target||0)/maxTarget)*100);
+    const cls=(t.label||"").toLowerCase();
+    return `<div class="mark ${cls}" style="left:${left}%"><b>${medal(cls)} ${esc(t.label)}</b>${num(t.target)} Deals</div>`;
+  }).join("");
+  const nextLine = next ? `▲ noch <b style="color:var(--text)">${num(Math.max(0,(next.target||0)-cur))}</b> bis ${esc(next.label)}`
+                        : (reached?`Top-Stufe ${esc(reached.label)} erreicht 🎉`:"");
+  document.getElementById("goalbar").innerHTML =
+    `<div class="tierline"><span>Aktuell: <b style="color:var(--text)">${num(cur)} Deals</b></span><span>${nextLine}</span></div>`+
+    `<div class="track"><div class="fill" style="width:${fillPct}%"></div></div>`+
+    `<div class="marks">${marks}</div>`+
+    (reached ? `<span class="badge ${(reached.label||"").toLowerCase()}">★ ${esc(reached.label)} erreicht</span>`
+             : `<span class="badge">Noch kein Tier erreicht</span>`);
+
+  // ---- Standort-Battle (Sparte-abhängig, immer beide Standorte) ----
+  document.getElementById("battlePill").textContent = spLabel(sp)+"-Deals";
+  const all = rowsFor(sp);
+  const fd = sumDeals(all.filter(r=>(r.location||'').toUpperCase()==='FFM'));
+  const bd = sumDeals(all.filter(r=>(r.location||'').toUpperCase()==='B'));
+  const dim = code => (loc!=='all' && loc!==code) ? 'opacity:.45;' : '';
+  const side=(name,d,win,code)=>`<div class="side ${win?'win':''}" style="${dim(code)}"><div class="loc">${esc(name)}</div>`+
+    `<div class="big">${num(d)}</div><div class="cap">Deals</div></div>`;
+  document.getElementById("battleWrap").innerHTML =
+    `<div class="battle">${side("Frankfurt",fd,fd>=bd,'FFM')}<div class="vs">VS</div>${side("Berlin",bd,bd>fd,'B')}</div>`;
+
+  // ---- Leaderboards (gefiltert) ----
+  function lbCard(title, rows){
+    const sorted=[...rows].sort((a,b)=>(b.deals||0)-(a.deals||0));
+    const body = sorted.length ? sorted.map((r,i)=>{
+      const m=i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1);
+      return `<div class="row"><div class="rank">${m}</div>`+
+        `<div class="ini">${esc(r.initials||"")}</div>`+
+        `<div class="who"><span class="nm">${esc(r.name||"")}${r.location?`<span class="loc-tag">${esc(r.location)}</span>`:""}</span></div>`+
+        `<div class="dealn">${num(r.deals)}<small>Deals</small></div></div>`;
+    }).join("") : `<div class="empty">Keine Placements im Filter.</div>`;
+    return `<div class="lbcard"><div class="lbhead"><span class="sq"></span>${esc(title)}</div>${body}</div>`;
+  }
+  let cardsHtml="";
+  if(sp==='gesamt'){
+    cardsHtml = lbCard("Experts · Placements", byLoc(rowsFor('experts'),loc))
+              + lbCard("Contracting · Placements", byLoc(rowsFor('contracting'),loc));
+  } else {
+    cardsHtml = lbCard(spLabel(sp)+" · Placements", sel);
+  }
+  document.getElementById("leaderWrap").innerHTML = cardsHtml;
+}
 
 function render(cfg){
-  const meta=cfg.meta||{}, goals=cfg.goals||{}, kpis=cfg.kpis||{},
-        totals=cfg.totals||{}, locations=cfg.locations||[], lb=cfg.leaderboard||{};
-
+  DATA = cfg;
+  const meta=cfg.meta||{};
   document.getElementById("title").textContent = meta.title || "Team Dashboard";
   document.getElementById("subtitle").textContent = meta.subtitle || "";
   document.getElementById("quarter").textContent = meta.quarter ? "Überblick "+meta.quarter : "";
-  document.getElementById("live").textContent = meta.source ? meta.source : "Vincere Live";
   if(meta.lastUpdated){
     const d=new Date(meta.lastUpdated);
     document.getElementById("updated").textContent =
       "Stand: "+d.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
   } else { document.getElementById("updated").textContent = ""; }
-
-  // ---- KPI-Karten ----
-  const runner=kpis.activeRunner||{}, dealsE=kpis.dealsExperts||{},
-        rahmen=kpis.rahmenvertraege||{}, team=kpis.teamSize||{};
-  const kpiCards = [
-    runner.target!=null ? {l:"Aktive Runner", v:num(runner.current)+" / "+num(runner.target),
-        sub:"Jahresziel · noch "+num(Math.max(0,(runner.target||0)-(runner.current||0)))+" bis Ziel",
-        p:progress(runner.current,runner.target)} : null,
-    dealsE.target!=null ? {l:"Deals "+(meta.quarter||"")+" · Experts", v:num(dealsE.current)+" / "+num(dealsE.target),
-        sub:"Gold-Ziel "+num(dealsE.target), p:progress(dealsE.current,dealsE.target)} : null,
-    rahmen.target!=null ? {l:"Rahmenverträge", v:num(rahmen.current)+" / "+num(rahmen.target),
-        sub:"Ziel · noch "+num(Math.max(0,(rahmen.target||0)-(rahmen.current||0)))+" Partner",
-        p:progress(rahmen.current,rahmen.target)} : null,
-    team.total!=null ? {l:"Team-Größe", v:num(team.total)+" Köpfe",
-        sub:[team.recruiting!=null?num(team.recruiting)+" Recruiting":null,
-             team.kam!=null?num(team.kam)+" KAM":null,
-             team.berlin!=null?num(team.berlin)+" Berlin":null].filter(Boolean).join(" · ")} : null
-  ].filter(Boolean);
-  document.getElementById("kpis").innerHTML = kpiCards.map(k=>
-    `<div class="card"><div class="label">${k.l}</div><div class="value">${k.v}</div>`+
-    (k.sub?`<div class="sub">${k.sub}</div>`:"")+
-    (k.p!=null?`<div class="mini"><span style="width:${k.p}%"></span></div>`:"")+
-    `</div>`).join("");
-
-  // ---- Ziel-Stufen in Deal-Count ----
-  const cur = totals.dealsExperts!=null ? totals.dealsExperts : (dealsE.current||0);
-  const tiers = ["bronze","silber","gold"].map(k=>goals[k]).filter(t=>t&&t.target!=null);
-  const maxTarget = Math.max(1, ...tiers.map(t=>t.target||0));
-  const pct = Math.min(100,(cur/maxTarget)*100);
-  let reached=null, next=null;
-  ["bronze","silber","gold"].forEach(k=>{ const t=goals[k];
-    if(t&&t.target!=null){ if(cur>=t.target) reached=t; else if(!next) next=t; } });
-  const marks = tiers.map(t=>{
-    const left=Math.min(100,((t.target||0)/maxTarget)*100);
-    const cls=(t.label||"").toLowerCase();
-    const medal = cls==="bronze"?"🥉":cls==="silber"?"🥈":cls==="gold"?"🥇":"";
-    return `<div class="mark ${cls}" style="left:${left}%"><b>${medal} ${t.label}</b>${num(t.target)} Deals</div>`;
-  }).join("");
-  const nextLine = next ? `▲ noch ${num(Math.max(0,(next.target||0)-cur))} bis ${next.label}`
-                        : (reached?`Top-Stufe ${reached.label} erreicht 🎉`:"");
-  document.getElementById("goalbar").innerHTML =
-    `<div class="tierline"><span>Aktuell: <b style="color:var(--text)">${num(cur)} Deals</b></span><span>${nextLine}</span></div>`+
-    `<div class="track"><div class="fill" style="width:${pct}%"></div></div>`+
-    `<div class="marks">${marks}</div>`+
-    (reached ? `<span class="badge ${(reached.label||"").toLowerCase()}">★ ${reached.label} erreicht</span>`
-             : `<span class="badge">Noch kein Tier erreicht</span>`);
-
-  // ---- Standort-Battle ----
-  const ffm = locations.find(l=>(l.code||"").toUpperCase()==="FFM") || locations[0] || {};
-  const ber = locations.find(l=>(l.code||"").toUpperCase()==="B" || (l.name||"").toLowerCase().includes("berlin")) || locations[1] || {};
-  const fd=ffm.dealsExperts||0, bd=ber.dealsExperts||0;
-  document.getElementById("battleWrap").innerHTML =
-    `<div class="battle">`+
-    `<div class="side ${fd>=bd?"win":""}"><div class="loc">${ffm.name||"Frankfurt"}</div>`+
-    `<div class="big">${num(fd)}</div><div class="cap">Deals${ffm.activeRunner!=null?" · "+num(ffm.activeRunner)+" Runner":""}</div></div>`+
-    `<div class="vs">VS</div>`+
-    `<div class="side ${bd>fd?"win":""}"><div class="loc">${ber.name||"Berlin"}</div>`+
-    `<div class="big">${num(bd)}</div><div class="cap">Deals${ber.activeRunner!=null?" · "+num(ber.activeRunner)+" Runner":""}</div></div>`+
-    `</div>`;
-
-  // ---- Leaderboard ----
-  function lbTable(title, rows){
-    if(!rows||!rows.length) return "";
-    const sorted=[...rows].sort((a,b)=>(b.deals||0)-(a.deals||0));
-    const body=sorted.map((r,i)=>{
-      const medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1);
-      return `<tr><td class="rank">${medal}</td>`+
-        `<td><span class="ini">${r.initials||""}</span>${r.name||""}`+
-        `${r.location?`<span class="loc-tag">${r.location}</span>`:""}</td>`+
-        `<td class="num">${num(r.deals)}</td></tr>`;
-    }).join("");
-    return `<div><div class="section-title" style="margin-bottom:10px">${title}</div>`+
-      `<table><thead><tr><th class="rank">#</th><th>Recruiter</th><th class="num">Deals</th></tr></thead>`+
-      `<tbody>${body}</tbody></table></div>`;
-  }
-  document.getElementById("leaderWrap").innerHTML =
-    lbTable("Experts", lb.experts) + lbTable("Contracting", lb.contracting)
-    || `<div class="card"><div class="sub">Noch keine Leaderboard-Daten.</div></div>`;
+  update();
 }
 
 function showError(msg){
   document.getElementById("updated").textContent = "Laden fehlgeschlagen";
   document.getElementById("kpis").innerHTML =
-    `<div class="errorbox"><div class="label">Fehler beim Laden der Daten</div>`+
-    `<div class="msg">${msg}</div></div>`;
+    `<div class="errorbox"><div class="label">Fehler beim Laden der Daten</div><div class="msg">${esc(msg)}</div></div>`;
   ["goalbar","battleWrap","leaderWrap"].forEach(id=>document.getElementById(id).innerHTML="");
 }
+
+// Toggle-Verdrahtung
+document.getElementById("toolbar").addEventListener("click", e=>{
+  const btn = e.target.closest("button[data-val]");
+  if(!btn) return;
+  const group = btn.parentElement.getAttribute("data-group");
+  [...btn.parentElement.children].forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  STATE[group] = btn.getAttribute("data-val");
+  update();
+});
 
 async function load(){
   const btn = document.getElementById("reload");
